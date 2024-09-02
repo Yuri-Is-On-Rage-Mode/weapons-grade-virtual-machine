@@ -1,0 +1,493 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Diagnostics;
+using System.Collections;
+
+namespace VinVirtualOS
+{
+    public class Program
+    {
+        private static string OsPath = "./_os_env";
+        private static string CurrentVm = "default";
+        private static string CurrentUser = "user";
+        private static string CurrentDirectory = "/";
+
+        static void Main(string[] args)
+        {
+            InitializeOS();
+            RunCommandLoop();
+        }
+
+        private static void InitializeOS()
+        {
+            if (!Directory.Exists(OsPath))
+            {
+                CreateDirectoryStructure();
+            }
+            Console.WriteLine("Vin Virtual OS initialized.");
+        }
+
+        private static void CreateDirectoryStructure()
+        {
+            Directory.CreateDirectory(Path.Combine(OsPath, "bin"));
+            Directory.CreateDirectory(Path.Combine(OsPath, "ibin"));
+            Directory.CreateDirectory(Path.Combine(OsPath, "home"));
+            Directory.CreateDirectory(Path.Combine(OsPath, "etc"));
+            Directory.CreateDirectory(Path.Combine(OsPath, "trash"));
+            Directory.CreateDirectory(Path.Combine(OsPath, "lib"));
+        }
+
+        private static void RunCommandLoop()
+        {
+            while (true)
+            {
+                string prompt = GeneratePrompt();
+                Console.Write(prompt);
+                string input = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(input)) continue;
+
+                if (input.ToLower() == "exit")
+                {
+                    if (ConfirmExit())
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                ExecuteCommand(input);
+            }
+        }
+
+        private static string GeneratePrompt()
+        {
+            string gitBranch = GetGitBranch();
+            string gitInfo = !string.IsNullOrEmpty(gitBranch) ? $" ({gitBranch})" : "";
+            return $"\u001b[32m{CurrentUser}\u001b[0m@\u001b[34m{CurrentVm}\u001b[0m \u001b[36m{CurrentDirectory}\u001b[0m{gitInfo} $ ";
+        }
+
+        private static string GetGitBranch()
+        {
+            // This is a placeholder. In a real implementation, you'd check for a .git directory
+            // and use a Git library or process to get the current branch.
+            return "";
+        }
+
+        private static bool ConfirmExit()
+        {
+            Console.Write("Are you sure you want to exit? (y/n): ");
+            string response = Console.ReadLine().ToLower();
+            return response == "y" || response == "yes";
+        }
+
+        private static void ExecuteCommand(string input)
+        {
+            string[] parts = input.Split(' ');
+            string command = parts[0].ToLower();
+            string[] args = parts.Skip(1).ToArray();
+
+            switch (command)
+            {
+                case "help":
+                    ShowHelp();
+                    break;
+                case "version":
+                    ShowVersion();
+                    break;
+                case "ls":
+                    ListDirectory(args);
+                    break;
+                case "cd":
+                    ChangeDirectory(args);
+                    break;
+                case "mkdir":
+                    CreateDirectory(args);
+                    break;
+                case "touch":
+                    CreateFile(args);
+                    break;
+                case "@vm":
+                    HandleVmCommand(args);
+                    break;
+                case "@user":
+                    HandleUserCommand(args);
+                    break;
+                case "@env":
+                    HandleEnvCommand(args);
+                    break;
+                default:
+                    Console.WriteLine($"Command not found: {command}");
+                    break;
+            }
+        }
+
+        private static void ShowHelp()
+        {
+            Console.WriteLine("Available commands:");
+            Console.WriteLine("  help        - Show this help message");
+            Console.WriteLine("  version     - Show Vin Virtual OS version");
+            Console.WriteLine("  ls          - List directory contents");
+            Console.WriteLine("  cd          - Change directory");
+            Console.WriteLine("  mkdir       - Create a new directory");
+            Console.WriteLine("  touch       - Create a new file");
+            Console.WriteLine("  @vm         - Virtual Machine management");
+            Console.WriteLine("  @user       - User management");
+            Console.WriteLine("  @env        - Environment variable management");
+            Console.WriteLine("  exit        - Exit Vin Virtual OS");
+        }
+
+        private static void ShowVersion()
+        {
+            Console.WriteLine("Vin Virtual OS v1.0.0");
+        }
+
+        private static void ListDirectory(string[] args)
+        {
+            string path = args.Length > 0 ? args[0] : CurrentDirectory;
+            string fullPath = Path.Combine(OsPath, "home", CurrentUser, path);
+
+            if (Directory.Exists(fullPath))
+            {
+                string[] entries = Directory.GetFileSystemEntries(fullPath);
+                foreach (string entry in entries)
+                {
+                    Console.WriteLine(Path.GetFileName(entry));
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Directory not found: {path}");
+            }
+        }
+
+        private static void ChangeDirectory(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                CurrentDirectory = "/";
+                return;
+            }
+
+            string newPath = Path.Combine(CurrentDirectory, args[0]);
+            string fullPath = Path.Combine(OsPath, "home", CurrentUser, newPath);
+
+            if (Directory.Exists(fullPath))
+            {
+                CurrentDirectory = newPath;
+            }
+            else
+            {
+                Console.WriteLine($"Directory not found: {args[0]}");
+            }
+        }
+
+        private static void CreateDirectory(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: mkdir <directory_name>");
+                return;
+            }
+
+            string newDir = Path.Combine(OsPath, "home", CurrentUser, CurrentDirectory, args[0]);
+            try
+            {
+                Directory.CreateDirectory(newDir);
+                Console.WriteLine($"Directory created: {args[0]}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating directory: {ex.Message}");
+            }
+        }
+
+        private static void CreateFile(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: touch <file_name>");
+                return;
+            }
+
+            string newFile = Path.Combine(OsPath, "home", CurrentUser, CurrentDirectory, args[0]);
+            try
+            {
+                File.Create(newFile).Close();
+                Console.WriteLine($"File created: {args[0]}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating file: {ex.Message}");
+            }
+        }
+
+        private static void HandleVmCommand(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @vm <command> [args]");
+                return;
+            }
+
+            string subCommand = args[0].ToLower();
+            string[] subArgs = args.Skip(1).ToArray();
+
+            switch (subCommand)
+            {
+                case "new":
+                    CreateNewVm(subArgs);
+                    break;
+                case "load":
+                    LoadVm(subArgs);
+                    break;
+                case "list":
+                    ListVms();
+                    break;
+                default:
+                    Console.WriteLine($"Unknown VM command: {subCommand}");
+                    break;
+            }
+        }
+
+        private static void CreateNewVm(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @vm new <vm_name>");
+                return;
+            }
+
+            string vmName = args[0];
+            string vmPath = Path.Combine(OsPath, "home", vmName);
+
+            if (Directory.Exists(vmPath))
+            {
+                Console.WriteLine($"VM already exists: {vmName}");
+                return;
+            }
+
+            try
+            {
+                Directory.CreateDirectory(vmPath);
+                Directory.CreateDirectory(Path.Combine(vmPath, "workspace"));
+                Directory.CreateDirectory(Path.Combine(vmPath, "etc"));
+                Directory.CreateDirectory(Path.Combine(vmPath, "media"));
+                Directory.CreateDirectory(Path.Combine(vmPath, "bin"));
+
+                File.WriteAllText(Path.Combine(vmPath, "workspace", "README.md"), $"# Welcome to {vmName}\n\nThis is your new virtual machine.");
+
+                Console.WriteLine($"VM created: {vmName}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating VM: {ex.Message}");
+            }
+        }
+
+        private static void LoadVm(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @vm load <vm_name>");
+                return;
+            }
+
+            string vmName = args[0];
+            string vmPath = Path.Combine(OsPath, "home", vmName);
+
+            if (!Directory.Exists(vmPath))
+            {
+                Console.WriteLine($"VM not found: {vmName}");
+                return;
+            }
+
+            CurrentVm = vmName;
+            CurrentDirectory = "/";
+            Console.WriteLine($"Loaded VM: {vmName}");
+        }
+
+        private static void ListVms()
+        {
+            string[] vms = Directory.GetDirectories(Path.Combine(OsPath, "home"));
+            Console.WriteLine("Available VMs:");
+            foreach (string vm in vms)
+            {
+                Console.WriteLine($"  {Path.GetFileName(vm)}");
+            }
+        }
+
+        private static void HandleUserCommand(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @user <command> [args]");
+                return;
+            }
+
+            string subCommand = args[0].ToLower();
+            string[] subArgs = args.Skip(1).ToArray();
+
+            switch (subCommand)
+            {
+                case "add":
+                    AddUser(subArgs);
+                    break;
+                case "switch":
+                    SwitchUser(subArgs);
+                    break;
+                case "list":
+                    ListUsers();
+                    break;
+                default:
+                    Console.WriteLine($"Unknown user command: {subCommand}");
+                    break;
+            }
+        }
+
+        private static void AddUser(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @user add <username>");
+                return;
+            }
+
+            string username = args[0];
+            string userPath = Path.Combine(OsPath, "home", username);
+
+            if (Directory.Exists(userPath))
+            {
+                Console.WriteLine($"User already exists: {username}");
+                return;
+            }
+
+            try
+            {
+                Directory.CreateDirectory(userPath);
+                Console.WriteLine($"User created: {username}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating user: {ex.Message}");
+            }
+        }
+
+        private static void SwitchUser(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @user switch <username>");
+                return;
+            }
+
+            string username = args[0];
+            string userPath = Path.Combine(OsPath, "home", username);
+
+            if (!Directory.Exists(userPath))
+            {
+                Console.WriteLine($"User not found: {username}");
+                return;
+            }
+
+            CurrentUser = username;
+            CurrentDirectory = "/";
+            Console.WriteLine($"Switched to user: {username}");
+        }
+
+        private static void ListUsers()
+        {
+            string[] users = Directory.GetDirectories(Path.Combine(OsPath, "home"));
+            Console.WriteLine("Available users:");
+            foreach (string user in users)
+            {
+                Console.WriteLine($"  {Path.GetFileName(user)}");
+            }
+        }
+
+        private static void HandleEnvCommand(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @env <command> [args]");
+                return;
+            }
+
+            string subCommand = args[0].ToLower();
+            string[] subArgs = args.Skip(1).ToArray();
+
+            switch (subCommand)
+            {
+                case "set":
+                    SetEnvVariable(subArgs);
+                    break;
+                case "get":
+                    GetEnvVariable(subArgs);
+                    break;
+                case "list":
+                    ListEnvVariables();
+                    break;
+                default:
+                    Console.WriteLine($"Unknown env command: {subCommand}");
+                    break;
+            }
+        }
+
+        private static void SetEnvVariable(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: @env set <variable> <value>");
+                return;
+            }
+
+            string variable = args[0];
+            string value = string.Join(" ", args.Skip(1));
+
+            try
+            {
+                Environment.SetEnvironmentVariable(variable, value);
+                Console.WriteLine($"Environment variable set: {variable}={value}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error setting environment variable: {ex.Message}");
+            }
+        }
+
+        private static void GetEnvVariable(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: @env get <variable>");
+                return;
+            }
+
+            string variable = args[0];
+            string value = Environment.GetEnvironmentVariable(variable);
+
+            if (value != null)
+            {
+                Console.WriteLine($"{variable}={value}");
+            }
+            else
+            {
+                Console.WriteLine($"Environment variable not found: {variable}");
+            }
+        }
+
+        private static void ListEnvVariables()
+        {
+            Console.WriteLine("Environment variables:");
+            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
+            {
+                Console.WriteLine($"  {entry.Key}={entry.Value}");
+            }
+        }
+    }
+}
