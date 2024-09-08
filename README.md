@@ -2,6 +2,8 @@
 
 Welcome to **Vin**, our state-of-the-art implementation of a virtual virtual machine, crafted with precision in C#. Get ready to explore a new dimension of virtualization with this powerful tool!
 
+> CURRENTLY GITUHB DOESNOT SUPPORT FILES BIGGER THEN 25 MB, SO I CAN NOT UPLOAD THE `.vin_env` DIR , BUT I WILL FIND A WAY OF THAT TOO! YOU GUYS CAN SUGGEST ME A WAY OF THAT PLEASE!, I HAVE MANY USEFULL BINARYS FOR THIS VIRTUAL VIRTUAL-OS SUCH AS `ls` , `tree` , `mkdir` , `mv` , `cp` AND MORE!
+
 #### **TASTE**
 ```sh
 (#) Vin Virtual Os / Develpement Env
