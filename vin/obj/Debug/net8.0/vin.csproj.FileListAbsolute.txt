@@ -1,0 +1,14 @@
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\vin.GeneratedMSBuildEditorConfig.editorconfig
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\vin.AssemblyInfoInputs.cache
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\vin.AssemblyInfo.cs
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\vin.csproj.CoreCompileInputs.cache
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\bin\Debug\net8.0\vin.exe
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\bin\Debug\net8.0\vin.deps.json
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\bin\Debug\net8.0\vin.runtimeconfig.json
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\bin\Debug\net8.0\vin.dll
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\bin\Debug\net8.0\vin.pdb
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\vin.dll
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\refint\vin.dll
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\vin.pdb
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\vin.genruntimeconfig.cache
+G:\fri3nds\v-category-projects\Developer-Grade-Virtual-OS\vin\vin\obj\Debug\net8.0\ref\vin.dll
