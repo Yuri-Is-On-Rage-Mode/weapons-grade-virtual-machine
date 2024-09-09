@@ -16,7 +16,7 @@ namespace vin.Command
         public static string CurrentDirDest = UserHomeDir;
 
         private static string UserHomeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        private static string VinEnvDir = Path.Combine(UserHomeDir, ".vin_env", "vars");
+        private static string VinEnvDir = Path.Combine(UserHomeDir, "vin_env", "vars");
         private static string EnvVarsFile = Path.Combine(VinEnvDir, "env_vars.json");
         private static string AliasesFile = Path.Combine(VinEnvDir, "aliases.json");
 
@@ -186,7 +186,7 @@ namespace vin.Command
             string executable = parts.Length > 1 ? parts[1] : parts[0];
             string[] args = parts.Skip(2).ToArray();
 
-            string filePath = $"C:\\Users\\{Environment.UserName}\\.vin_env\\bin\\{executable}\\{executable}.exe";
+            string filePath = $"C:\\Users\\{Environment.UserName}\\vin_env\\bin\\{executable}\\{executable}.exe";
             try
             {
                 using (Process process = Process.Start(filePath, string.Join(" ", args)))
@@ -256,7 +256,7 @@ namespace vin.Command
                 string[] args = parts.Length > 2 ? parts.Skip(1).ToArray() : new string[1];  // Skip the first part
 
                 // Construct the full path for the script in the ibin directory
-                string filePath = Path.Combine($"C:\\Users\\{Environment.UserName}\\.vin_env\\ibin\\{executable}", fileName);
+                string filePath = Path.Combine($"C:\\Users\\{Environment.UserName}\\vin_env\\ibin\\{executable}", fileName);
 
                 // Check if the file exists
                 if (!File.Exists(filePath))
